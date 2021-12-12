@@ -11,13 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Missing values are popular problem among research of all kinds specifically in industries like finance that contain sensitive information about people. It not only leads to loss of information and reduced statistical power but indirectly can also lead to researchers introducing selection bias, which in many cases makes the study unreliable (Frisell, 1). In this project, we will look at the two major methods of imputing missing values; single imputation and multiple imputation. To compare the two approaches, we took a complete data set and created missing values within the data. These missing values are than imputed with fore mentioned methods. A classification model is created, fitted onto the imputed and then actual data sets and the resulting standard estimates are then compared. Model building process was carried out on one of imputed data sets rather than the complete data as I wanted to replicate a real life scenario. 
+Missing values are popular problem among research of all kinds specifically in industries like finance that contain sensitive information about people. It not only leads to loss of information and reduced statistical power but can also lead to researchers introducing selection bias, which in many cases ivalidates the study (Frisell, 1). In this project, we will look at the two major methods of imputing missing values; single imputation and multiple imputation. To compare the two approaches, we took a complete data set and created missing values within the data. These missing values are than imputed with fore mentioned methods. A classification model is created, fitted onto the imputed and the actual data sets and the resulting standard estimates are then compared. Model building process was carried out on one of imputed data sets rather than the complete data as I wanted to replicate a real life scenario. 
 
 ## Data and Missing Value Amputation
 
 The data chosen for this analysis was customer churn data of a banking product. Given that this was a fictional data set there is not much background information available in this data. The data set contained information on customers' geography, demographics, bank account details and some personal information like salary. The codebook for the dataset has been provided in the appendix.
 
-The missing values were created within the age and the salary variable as these variables are regarded as personal information and people are less likely to disclose this information. To ensure the missing at random (MAR) property is intact, we created missing values based on information from other variables. We used logistic regression to construct a binary variable indicating data entries in which we create missing values for the variables age and salary. We assume that females are more likely to hide their age as compared to males. Moreover, Germans and French people are less likely to not reveal their age. We also added an interaction between age and gender variables in our model to create the binary indicator of missingness for age variable.
+The missing values were created within the age and the salary variable as these variables are regarded as personal information and people are less likely to disclose this information. To ensure the missing at random (MAR) property is intact, we created missing values based on information from other variables. We used logistic regression to construct a binary variable indicating data entries in which we create missing values for the variables age and salary. We assume that females are more likely to hide their age as compared to males. Moreover, Germans and French people are less likely to not reveal their age. We also added an interaction between age and gender variables in our model to create the binary indicator of missingness for the age variable.
 
 
 $$
@@ -51,12 +51,12 @@ library(dplyr)
 
 
 #load csv
-churn <-read.table('/Users/mohammadanas/Desktop/Duke MIDS/Fall 2021/MODELLING AND REPRESENTATION OF DATA/Final Project/Churn_Modelling.csv', 
+churn <-read.table('/Users/mohammadanas/Desktop/anas github/Missing-Value-Analysis-and-Customer-Churn/Data/Churn_Modelling.csv', 
                    sep =",", header = TRUE, quote ="\"")
 
 
 # load again to preserve actual values
-churn_complete <-read.table('/Users/mohammadanas/Desktop/Duke MIDS/Fall 2021/MODELLING AND REPRESENTATION OF DATA/Final Project/Churn_Modelling.csv', 
+churn_complete <-read.table('/Users/mohammadanas/Desktop/anas github/Missing-Value-Analysis-and-Customer-Churn/Data/Churn_Modelling.csv', 
                             sep =",", header = TRUE, quote ="\"")
 
 
@@ -115,7 +115,7 @@ churn_only_missing_columns <- churn_missing[,c(4,10)]
 ```
 ## Single Imputation
 
-We chose nearest neighbor imputation as the single imputation method. For each missing value, we look at the two most similar complete data entries based on the other variables provided in the data. Given that our variables which have missing data are continuous, we replace the missing value with the average value of the identified 2 nearest neighbors for that particular column. Euclidean distance was used as a metric to determine similarity between data entries. Given that over fitting is preferred when dealing with missing values 2 was chosen as the hyper parameter (K). 
+We chose nearest neighbor imputation as the single imputation method. For each missing value, we look at the two most similar complete data entries based on the other variables provided in the data. Given that our variables which have missing data are continuous, we replace the missing value with the average value of the 2 identified nearest neighbors for that particular column. Euclidean distance was used as a metric to determine similarity between data entries. Given that over fitting is preferred when dealing with missing values 2 was chosen as the hyper parameter (K). 
 
 ## Multiple Imputation
 
@@ -184,7 +184,7 @@ ggplot(d6,aes(x=Exited, y=Balance)) + geom_boxplot()
 
 ```
 
-We also tested the interactions that made intuitive sense like credit score and credit card, age and gender, age and geography and age and balance. The interaction between Geography and Salary and Balance and Geography were found interesting. The boxplots for interactions have been added to the appendix.
+We also tested the interactions that made intuitive sense like credit score and credit card, age and gender, age and geography and age and balance. The interaction between Geography and Salary and Geography and Balance were found interesting. The boxplots for interactions have been added to the appendix.
 
 ### Model Selection
 
@@ -263,7 +263,7 @@ $$
 
 ## Sensitivity Analysis
 
-Now that we have our model prepared, we fit this model onto the actual complete data set and the data set that we got from Single Imputation. Lastly, we fit the same model to 10 imputed data sets that we got from multiple imputation method and pool the results together that we got from these 10 data sets. The results of the model are shown below.
+Now that we have our model prepared, we fit this model onto the actual complete data set and the data set that we got from Single Imputation. Lastly, we fit the same model to 10 imputed data sets that we got from multiple imputation method and pool the results together. The results of the models are shown below.
 
 ```{r,, results= "asis", echo=FALSE, warning=FALSE, message=FALSE, fig.height= 3}
 churn_complete <- rename(churn_complete, Salary = EstimatedSalary)
@@ -382,9 +382,9 @@ kable(CI,caption = "Evaluation Metrics Comparison" )
 ```
 
 
-## Conclusion
+## Conclusion and Limitations
 
-Multiple Imputation methods clearly outperform the single imputation method that is most commonly used in the practical world. If our aim is understanding association between variables, we see estimates that we got from multiple imputation are way more closer to the ones that we get when the model is fitted onto the real data set. Moreover, the standard errors are also close to the actual standard errors. Therefore, multiple imputation is more reliable when understanding whether a particular variable has a significant impact on the response variable. When predicting values, we see that the difference in evaluation metrics was not much. However, multiple imputation performs better in that scenario as well.
+Multiple Imputation methods clearly outperform the single imputation method that is most commonly used in the practical world. If our aim is understanding association between variables, we see estimates that we got from multiple imputation are way more closer to the ones that we get when the model is fitted onto the real data set. Moreover, the standard errors are also close to the actual standard errors. Therefore, multiple imputation is more reliable when understanding whether a particular variable has a significant impact on the response variable. When predicting values, we see that there was much difference in the evaluation metrics. However, multiple imputation performs better in that scenario as well. Before we end, I would like to state that there is one limitation to this analysis. Whenever we do multiple imputation we assume that the values are missing at random for each variable, that means that each column's missingness is dependent on the value of some other column/s. Imputation only work if this assumption is satisfied, which is not always the case. Unfortunately, we do not have any way to check of this is assumption is violated or not.
 
 
 \newpage
@@ -393,6 +393,10 @@ Multiple Imputation methods clearly outperform the single imputation method that
 
 ## Apendix
 
+The data set used in this analysis can be found on my github profile. Click [here](https://github.com/anas14680/Missing-Value-Analysis-and-Customer-Churn) for that.
+
+
+The code book for the data set used is provided below.
 
 
 
